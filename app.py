@@ -1,10 +1,19 @@
-from flask import Flask, request, send_file
-from flask_cors import CORS
+from flask import Flask, request, render_template, send_file
 import cv2
 import numpy as np
+import os
 
 app = Flask(__name__)
-CORS(app)  # Allow requests from different origins
+
+UPLOAD_FOLDER = "static/uploads"
+PROCESSED_FOLDER = "static/processed"
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(PROCESSED_FOLDER, exist_ok=True)
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 @app.route("/process", methods=["POST"])
 def process_image():

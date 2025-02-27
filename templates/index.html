@@ -106,12 +106,10 @@
 </head>
 
 <body>
-
     <div class="container">
         <h2>Upload an Image for Processing</h2>
-        <label for="fileInput" class="custom-file-upload">Choose Image</label>
         <input type="file" id="fileInput">
-        <button class="btn" onclick="uploadImage()">Process Image</button>
+        <button onclick="uploadImage()">Process Image</button>
 
         <div class="image-container">
             <div class="image-box">
@@ -124,7 +122,7 @@
             </div>
         </div>
 
-        <button id="downloadBtn" class="btn" onclick="downloadImage()">Download Processed Image</button>
+        <button id="downloadBtn" style="display:none;" onclick="downloadImage()">Download</button>
     </div>
 
     <script>
@@ -140,35 +138,18 @@
             let formData = new FormData();
             formData.append("image", file);
 
-            fetch("http://127.0.0.1:5000/process", {
+            fetch("/process", {
                 method: "POST",
                 body: formData
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Server error: " + response.status);
-                    }
-                    return response.blob();
-                })
+                .then(response => response.blob())
                 .then(blob => {
                     let url = URL.createObjectURL(blob);
                     document.getElementById("processedImage").src = url;
-                    document.getElementById("downloadBtn").style.display = "block"; // Show download button
-
-                    // Store blob URL for downloading
+                    document.getElementById("downloadBtn").style.display = "block";
                     document.getElementById("downloadBtn").setAttribute("data-url", url);
                 })
-                .catch(error => {
-                    console.error("Error:", error);
-                    alert("Error processing image. Check console.");
-                });
-
-            // Show selected image
-            let reader = new FileReader();
-            reader.onload = function (event) {
-                document.getElementById("originalImage").src = event.target.result;
-            };
-            reader.readAsDataURL(file);
+                .catch(error => console.error("Error:", error));
         }
 
         function downloadImage() {
@@ -181,7 +162,6 @@
             document.body.removeChild(a);
         }
     </script>
-
 </body>
 
 </html>
