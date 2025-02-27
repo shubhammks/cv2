@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Processing</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1e1e2e;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* Card Container */
+        .container {
+            background: #2a2a40;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        /* Headings */
+        h2,
+        h3 {
+            color: #ffcc00;
+        }
+
+        /* File Input */
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Custom File Upload Button */
+        .custom-file-upload {
+            display: inline-block;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #fff;
+            background: #ffcc00;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .custom-file-upload:hover {
+            background: #e6b800;
+        }
+
+        /* Process & Download Buttons */
+        .btn {
+            margin: 10px auto;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #fff;
+            background: #007bff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        /* Image Container (Side by Side) */
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        /* Individual Image Box */
+        .image-box {
+            background: #333;
+            padding: 10px;
+            border-radius: 10px;
+            border: 3px solid #444;
+            text-align: center;
+            width: 45%;
+        }
+
+        /* Image Styling */
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+        }
+
+        /* Hide download button initially */
+        #downloadBtn {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Upload an Image for Processing</h2>
+        <label for="fileInput" class="custom-file-upload">Choose Image</label>
+        <input type="file" id="fileInput">
+        <button class="btn" onclick="uploadImage()">Process Image</button>
+
+        <div class="image-container">
+            <div class="image-box">
+                <h3>Original Image</h3>
+                <img id="originalImage" src="" alt="Original Image">
+            </div>
+            <div class="image-box">
+                <h3>Processed Image</h3>
+                <img id="processedImage" src="" alt="Processed Image">
+            </div>
+        </div>
+
+        <button id="downloadBtn" class="btn" onclick="downloadImage()">Download Processed Image</button>
+    </div>
+
+    <script>
+        function uploadImage() {
+            let fileInput = document.getElementById("fileInput");
+            let file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select an image first.");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("image", file);
+
+            fetch("http://127.0.0.1:5000/process", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Server error: " + response.status);
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    let url = URL.createObjectURL(blob);
+                    document.getElementById("processedImage").src = url;
+                    document.getElementById("downloadBtn").style.display = "block"; // Show download button
+
+                    // Store blob URL for downloading
+                    document.getElementById("downloadBtn").setAttribute("data-url", url);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Error processing image. Check console.");
+                });
+
+            // Show selected image
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                document.getElementById("originalImage").src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function downloadImage() {
+            let url = document.getElementById("downloadBtn").getAttribute("data-url");
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = "processed_image.png";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+
+</body>
+
+</html>
