@@ -4,112 +4,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Processing</title>
+    <title>Image Processor</title>
     <style>
-        /* General Styling */
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #1e1e2e;
-            color: #fff;
+            font-family: Arial, sans-serif;
             text-align: center;
-            padding: 20px;
+            background-color: #f4f4f4;
             margin: 0;
-        }
-
-        /* Card Container */
-        .container {
-            background: #2a2a40;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 600px;
+        }
+
+        .container {
+            width: 60%;
             margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
 
-        /* Headings */
-        h2,
-        h3 {
-            color: #ffcc00;
+        .upload-section {
+            margin-bottom: 20px;
         }
 
-        /* File Input */
         input[type="file"] {
-            display: none;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
-        /* Custom File Upload Button */
-        .custom-file-upload {
-            display: inline-block;
-            padding: 12px 20px;
-            font-size: 16px;
-            color: #fff;
-            background: #ffcc00;
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
             border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .custom-file-upload:hover {
-            background: #e6b800;
-        }
-
-        /* Process & Download Buttons */
-        .btn {
-            margin: 10px auto;
-            padding: 12px 20px;
+            background-color: #28a745;
+            color: white;
             font-size: 16px;
-            color: #fff;
-            background: #007bff;
-            border: none;
-            border-radius: 6px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            border-radius: 5px;
         }
 
-        .btn:hover {
-            background: #0056b3;
+        button:hover {
+            background-color: #218838;
         }
 
-        /* Image Container (Side by Side) */
         .image-container {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
             margin-top: 20px;
-            gap: 20px;
         }
 
-        /* Individual Image Box */
         .image-box {
-            background: #333;
-            padding: 10px;
-            border-radius: 10px;
-            border: 3px solid #444;
-            text-align: center;
             width: 45%;
+            text-align: center;
         }
 
-        /* Image Styling */
         img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
+            width: 100%;
+            max-height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-top: 10px;
         }
 
-        /* Hide download button initially */
         #downloadBtn {
             display: none;
+            margin-top: 20px;
+            background-color: #007bff;
+        }
+
+        #downloadBtn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h2>Upload an Image for Processing</h2>
-        <input type="file" id="fileInput">
-        <button onclick="uploadImage()">Process Image</button>
+        <h1>Image Processing App</h1>
+
+        <div class="upload-section">
+            <input type="file" id="fileInput" accept="image/*" onchange="previewImage()">
+            <button onclick="uploadImage()">Process Image</button>
+        </div>
 
         <div class="image-container">
             <div class="image-box">
@@ -122,10 +99,23 @@
             </div>
         </div>
 
-        <button id="downloadBtn" style="display:none;" onclick="downloadImage()">Download</button>
+        <button id="downloadBtn" style="display:none;" onclick="downloadImage()">Download Processed Image</button>
     </div>
 
     <script>
+        function previewImage() {
+            let fileInput = document.getElementById("fileInput");
+            let file = fileInput.files[0];
+
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("originalImage").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function uploadImage() {
             let fileInput = document.getElementById("fileInput");
             let file = fileInput.files[0];
