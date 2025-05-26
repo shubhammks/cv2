@@ -28,19 +28,18 @@ def process_image():
         return "Failed to process image", 400
 
     # Resize image
-    h, w, _ = img.shape
-    img = cv2.resize(img, (w, h))
-
-    # Apply Canny Edge Detection
-    edges = cv2.Canny(img, 20, 50)
-    edges = cv2.bitwise_not(edges)
-    new_img=cv2.bitwise_and(img,img,mask=edges)
-    h1,w2,_=new_img.shape
-    new_img=cv2.resize(new_img,(w2,h1))
+    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    inverted=cv2.bitwise_not(gray)
+    inverted_blur=cv2.GaussianBlur(inverted,(199,199),0)
+    skech=cv2.divide(gray,255-inverted_blur,scale=256)
+    kernal_sharpen=np.array([[-1,-1,-1],
+                            [-1,9,-1],
+                            [-1,-1,-1]])
+    sharp_skech=cv2.filter2D(skech,-1,kernal_sharpen)
 
     # Save and return processed image
     processed_path = "processed.png"
-    cv2.imwrite(processed_path, new_img)
+    cv2.imwrite(processed_path, sharp_skech)
 
     return send_file(processed_path, mimetype="image/png")
 
